@@ -4,71 +4,60 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Happy Birthday Gift</title>
-    <!-- ライブラリの読み込み -->
+    <!-- 安定したライブラリのみを読み込み -->
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
+        /* ふわふわ浮くアニメーション */
         @keyframes float {
             0%, 100% { transform: translateY(0) rotate(0); }
             50% { transform: translateY(-15px) rotate(5deg); }
         }
         .animate-float { animation: float 3s infinite ease-in-out; }
+        /* 読み込み前の真っ白を防ぐための背景 */
+        body { background-color: #fefce8; margin: 0; }
     </style>
 </head>
 <body>
-    <div id="root"></div>
+    <!-- JavaScriptが動かない場合の保険メッセージ -->
+    <div id="root" class="flex items-center justify-center min-h-screen text-gray-400 font-bold">
+        Loading...
+    </div>
 
     <script type="text/babel">
         const { useState, useEffect } = React;
 
-        // アイコン表示用パーツ
-        const Icon = ({ name, size = 24, className = "" }) => {
-            const [svg, setSvg] = useState("");
-            useEffect(() => {
-                if (window.lucide && window.lucide.icons[name]) {
-                    const iconSvg = window.lucide.icons[name].toSvg({
-                        width: size, height: size, class: className, 'stroke-width': 2.5
-                    });
-                    setSvg(iconSvg);
-                }
-            }, [name, size, className]);
-            return <span dangerouslySetInnerHTML={{ __html: svg }} className="inline-block" />;
+        // シンプルなアイコンコンポーネント（SVGを直接埋め込み）
+        const SvgIcon = ({ type, className = "" }) => {
+            const icons = {
+                gift: <path d="M20 12v10H4V12M2 7h20v5H2zM12 22V7M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7zM12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />,
+                external: <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3" />,
+                rotate: <path d="M1 4v6h6M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+            };
+            return (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className={className} style={{width: '1.2em', height: '1.2em'}}>
+                    {icons[type]}
+                </svg>
+            );
         };
 
         const App = () => {
             const [isOpen, setIsOpen] = useState(false);
             const [giftUrl, setGiftUrl] = useState("https://www.google.com/"); 
 
-            // ==========================================
-            // ✨ 設定：ここを自由に変更できます
-            // ==========================================
-            const content = {
-                // 開く前の画面
-                before: {
-                    title: "HAPPY BIRTHDAY!!",
-                    desc: "お誕生日おめでとう！！\n今年もすてきな年になりますように！！",
-                    button: "プレゼントを開ける",
-                    badge: "FOR YOU",
-                    emoji: "🎂" // 真ん中の丸の中の絵文字
-                },
-                // 開いた後の画面
-                after: {
-                    title: "おめでとう！！",
-                    message: "ぜひどうぞ！",
-                    button: "ギフトを受け取る",
-                    emoji: "🍦", // アイス
-                    drinkEmoji: "🥤" // スタバ風ドリンク
-                }
-            };
-            // ==========================================
-
             useEffect(() => {
-                const params = new URLSearchParams(window.location.search);
-                const urlParam = params.get('url');
-                if (urlParam) setGiftUrl(decodeURIComponent(urlParam));
+                try {
+                    const params = new URLSearchParams(window.location.search);
+                    const urlParam = params.get('url');
+                    if (urlParam) {
+                        // URLが正しく読み取れるか確認
+                        setGiftUrl(decodeURIComponent(urlParam));
+                    }
+                } catch (e) {
+                    console.error("URLの読み込みに失敗しました", e);
+                }
             }, []);
 
             return (
@@ -76,15 +65,13 @@
                     
                     <div className={`max-w-md w-full bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border-4 transition-all duration-1000 ${isOpen ? 'border-pink-200' : 'border-yellow-200'}`}>
                         
-                        {/* ヘッダー装飾 */}
+                        {/* ヘッダー */}
                         <div className={`h-24 flex items-center justify-center relative overflow-hidden transition-colors duration-1000 ${isOpen ? 'bg-rose-500' : 'bg-amber-400'}`}>
-                            <div className="absolute inset-0 opacity-20 flex justify-around items-center p-4">
-                                <Icon name="Gift" size={40} className="text-white" />
-                                <Icon name="Heart" size={40} className="text-white" />
-                                <Icon name="PartyPopper" size={40} className="text-white" />
+                            <div className="absolute inset-0 opacity-20 flex justify-around items-center p-4 text-white text-3xl">
+                                <span>🎁</span><span>✨</span><span>🎈</span>
                             </div>
                             <div className={`absolute top-4 right-[-35px] font-black py-1 px-12 transform rotate-45 shadow-md text-[10px] transition-colors ${isOpen ? 'bg-yellow-300 text-rose-800' : 'bg-white text-amber-800'}`}>
-                                {isOpen ? 'CONGRATS!' : content.before.badge}
+                                {isOpen ? 'CONGRATS!' : 'FOR YOU'}
                             </div>
                         </div>
 
@@ -93,15 +80,15 @@
                                 <div className="space-y-8 flex flex-col items-center">
                                     <div className="relative cursor-pointer group" onClick={() => setIsOpen(true)}>
                                         <div className="w-32 h-32 bg-amber-100 rounded-full flex items-center justify-center shadow-xl animate-float relative z-10 group-hover:scale-110 transition-transform">
-                                            <span className="text-6xl">{content.before.emoji}</span>
+                                            <span className="text-6xl">🎂</span>
                                         </div>
                                         <div className="absolute inset-0 bg-yellow-200 rounded-full blur-xl opacity-50 animate-pulse"></div>
                                     </div>
 
                                     <div className="space-y-3">
-                                        <h1 className="text-3xl font-black text-amber-900 tracking-tighter">{content.before.title}</h1>
+                                        <h1 className="text-3xl font-black text-amber-900 tracking-tighter">HAPPY BIRTHDAY!!</h1>
                                         <p className="text-gray-600 font-bold whitespace-pre-wrap leading-relaxed">
-                                            {content.before.desc}
+                                            お誕生日おめでとう！！{"\n"}今年もすてきな年になりますように！！
                                         </p>
                                     </div>
 
@@ -109,37 +96,33 @@
                                         onClick={() => setIsOpen(true)}
                                         className="w-full bg-rose-500 hover:bg-rose-600 text-white font-black py-5 rounded-2xl shadow-lg flex items-center justify-center space-x-3 text-lg transition-all active:scale-95"
                                     >
-                                        <Icon name="Gift" size={24} />
-                                        <span>{content.before.button}</span>
+                                        <SvgIcon type="gift" />
+                                        <span>プレゼントを開ける</span>
                                     </button>
                                 </div>
                             ) : (
                                 <div className="space-y-6 animate-in zoom-in duration-500">
                                     <div className="flex justify-center space-x-4">
-                                        <div className="text-7xl">{content.after.drinkEmoji}</div>
-                                        <div className="text-7xl">{content.after.emoji}</div>
+                                        <div className="text-7xl">🥤</div>
+                                        <div className="text-7xl">🍦</div>
                                     </div>
                                     
                                     <div className="bg-rose-50 p-8 rounded-[2rem] border-2 border-dashed border-rose-200 relative">
-                                        <h2 className="text-3xl font-black text-rose-700 mb-4 whitespace-pre-wrap">
-                                            {content.after.title}
-                                        </h2>
+                                        <h2 className="text-3xl font-black text-rose-700 mb-4">おめでとう！！</h2>
                                         
-                                        <p className="text-xl text-gray-800 font-black mb-8 whitespace-pre-wrap">
-                                            {content.after.message}
-                                        </p>
+                                        <p className="text-xl text-gray-800 font-black mb-8">ぜひどうぞ！</p>
 
                                         <a 
                                             href={giftUrl} target="_blank" rel="noopener noreferrer"
                                             className="block w-full bg-gradient-to-r from-rose-500 to-pink-500 text-white font-black py-5 rounded-xl shadow-xl flex items-center justify-center space-x-2 text-lg hover:brightness-110 transition-all"
                                         >
-                                            <span>{content.after.button}</span>
-                                            <Icon name="ExternalLink" size={20} />
+                                            <span>ギフトを受け取る</span>
+                                            <SvgIcon type="external" />
                                         </a>
                                     </div>
 
                                     <button onClick={() => setIsOpen(false)} className="text-gray-400 font-bold text-xs flex items-center justify-center mx-auto space-x-1">
-                                        <Icon name="RotateCcw" size={14} />
+                                        <SvgIcon type="rotate" />
                                         <span>戻る</span>
                                     </button>
                                 </div>
@@ -147,7 +130,7 @@
                         </div>
 
                         {/* 下部デコレーション */}
-                        <div className={`p-4 border-t flex justify-around ${isOpen ? 'bg-rose-100/50 border-rose-100' : 'bg-amber-50 border-amber-100'}`}>
+                        <div className={`p-4 border-t flex justify-around transition-colors duration-1000 ${isOpen ? 'bg-rose-100/50 border-rose-100' : 'bg-amber-50 border-amber-100'}`}>
                             {['🎈', '🎂', '🥤', '🍦', '🎁', '✨'].map((e, i) => (
                                 <span key={i} className={`text-lg transition-opacity duration-500 ${isOpen ? 'opacity-100' : 'opacity-20'}`}>
                                     {e}
@@ -163,8 +146,13 @@
             );
         };
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<App />);
+            // Reactのレンダリング
+            try {
+                const root = ReactDOM.createRoot(document.getElementById('root'));
+                root.render(<App />);
+            } catch (e) {
+                document.getElementById('root').innerHTML = "<p style='padding:20px; text-align:center;'>表示エラーが発生しました。ブラウザを更新してください。</p>";
+            }
     </script>
 </body>
 </html>
