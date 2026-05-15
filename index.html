@@ -101,24 +101,35 @@
 
             const currentTheme = themeConfig[theme] || themeConfig["1"];
 
+            // URLを修正する関数
+            const sanitizeUrl = (url) => {
+                if (!url) return "";
+                let decoded = decodeURIComponent(url);
+                // http:// または https:// で始まっていない場合は https:// を付ける
+                if (!decoded.match(/^https?:\/\//i)) {
+                    return `https://${decoded}`;
+                }
+                return decoded;
+            };
+
             useEffect(() => {
                 try {
                     const params = new URLSearchParams(window.location.search);
                     
                     // ギフトURLの取得
                     const urlParam = params.get('url');
-                    if (urlParam) setGiftUrl(decodeURIComponent(urlParam));
+                    if (urlParam) setGiftUrl(sanitizeUrl(urlParam));
                     
                     const urlParam2 = params.get('url2');
-                    if (urlParam2) setGiftUrl2(decodeURIComponent(urlParam2));
+                    if (urlParam2) setGiftUrl2(sanitizeUrl(urlParam2));
                     
-                    // テーマの取得 (?theme=2 など)
+                    // テーマの取得
                     const themeParam = params.get('theme');
                     if (themeParam && (themeParam === "1" || themeParam === "2")) {
                         setTheme(themeParam);
                     }
 
-                    // スタイルの取得 (?style=2 など)
+                    // スタイルの取得
                     const styleParam = params.get('style');
                     if (styleParam && (styleParam === "1" || styleParam === "2")) {
                         setLayoutStyle(styleParam);
@@ -190,7 +201,7 @@
                                         
                                         <div className="space-y-2 mb-8">
                                             <p className="text-xl text-gray-800 font-black leading-relaxed">
-                                                よかったらおいしいもの{"\n"}飲んでねー！
+                                                よかったらおいしいもの{"\n"}飲んでね！！
                                             </p>
                                             <p className={`text-sm ${currentTheme.subTitleAfter} font-bold`}>By ゆーち</p>
                                         </div>
@@ -234,7 +245,7 @@
                         </div>
                     </div>
 
-                    <div className="mt-8 text-gray-400 text-[10px] font-bold flex flex-col items-center space-y-2">
+                    <div className="mt-8 text-gray-400 text-[10px] font-bold flex flex-col items-center space-y-2 text-center">
                         <div className="flex items-center space-x-2 uppercase tracking-widest">
                             <span>✨</span>
                             <span>Happy Birthday to You!</span>
