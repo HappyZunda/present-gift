@@ -124,9 +124,12 @@
 
                                         <h2 className="text-3xl font-black text-rose-700 mb-4">おめでとう！！</h2>
                                         
-                                        <p className="text-xl text-gray-800 font-black mb-8 leading-relaxed">
-                                            よかったらおいしいもの{"\n"}飲んでねー！
-                                        </p>
+                                        <div className="space-y-2 mb-8">
+                                            <p className="text-xl text-gray-800 font-black leading-relaxed">
+                                                よかったらおいしいもの{"\n"}飲んでねー！
+                                            </p>
+                                            <p className="text-sm text-rose-400 font-bold italic">By ゆーち</p>
+                                        </div>
 
                                         <a 
                                             href={giftUrl} target="_blank" rel="noopener noreferrer"
@@ -171,7 +174,6 @@
         } catch (e) {
             document.getElementById('root').innerHTML = "<p style='padding:20px; text-align:center;'>表示エラーが発生しました。ブラウザを更新してください。</p>";
         }
-        
     </script>
 </body>
 </html>
