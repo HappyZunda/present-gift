@@ -15,13 +15,18 @@
             0%, 100% { transform: translateY(0) rotate(0); }
             50% { transform: translateY(-15px) rotate(5deg); }
         }
+        /* キラキラ光るアニメーション */
+        @keyframes sparkle {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.3; transform: scale(0.8); }
+        }
         .animate-float { animation: float 3s infinite ease-in-out; }
-        /* 読み込み前の真っ白を防ぐための背景 */
+        .animate-sparkle { animation: sparkle 1.5s infinite ease-in-out; }
+        
         body { background-color: #fefce8; margin: 0; }
     </style>
 </head>
 <body>
-    <!-- JavaScriptが動かない場合の保険メッセージ -->
     <div id="root" class="flex items-center justify-center min-h-screen text-gray-400 font-bold">
         Loading...
     </div>
@@ -52,7 +57,6 @@
                     const params = new URLSearchParams(window.location.search);
                     const urlParam = params.get('url');
                     if (urlParam) {
-                        // URLが正しく読み取れるか確認
                         setGiftUrl(decodeURIComponent(urlParam));
                     }
                 } catch (e) {
@@ -68,7 +72,9 @@
                         {/* ヘッダー */}
                         <div className={`h-24 flex items-center justify-center relative overflow-hidden transition-colors duration-1000 ${isOpen ? 'bg-rose-500' : 'bg-amber-400'}`}>
                             <div className="absolute inset-0 opacity-20 flex justify-around items-center p-4 text-white text-3xl">
-                                <span>🎁</span><span>✨</span><span>🎈</span>
+                                <span>{isOpen ? '✨' : '🎁'}</span>
+                                <span>{isOpen ? '⭐' : '✨'}</span>
+                                <span>{isOpen ? '🌟' : '🎈'}</span>
                             </div>
                             <div className={`absolute top-4 right-[-35px] font-black py-1 px-12 transform rotate-45 shadow-md text-[10px] transition-colors ${isOpen ? 'bg-yellow-300 text-rose-800' : 'bg-white text-amber-800'}`}>
                                 {isOpen ? 'CONGRATS!' : 'FOR YOU'}
@@ -87,7 +93,7 @@
 
                                     <div className="space-y-3">
                                         <h1 className="text-3xl font-black text-amber-900 tracking-tighter">HAPPY BIRTHDAY!!</h1>
-                                        <p className="text-gray-600 font-bold whitespace-pre-wrap leading-relaxed">
+                                        <p className="text-gray-600 font-bold whitespace-pre-wrap leading-relaxed text-lg">
                                             お誕生日おめでとう！！{"\n"}今年もすてきな年になりますように！！
                                         </p>
                                     </div>
@@ -101,16 +107,26 @@
                                     </button>
                                 </div>
                             ) : (
-                                <div className="space-y-6 animate-in zoom-in duration-500">
-                                    <div className="flex justify-center space-x-4">
-                                        <div className="text-7xl">🥤</div>
-                                        <div className="text-7xl">🍦</div>
+                                <div className="space-y-6 animate-in zoom-in duration-500 relative">
+                                    {/* 周りの星デコレーション */}
+                                    <div className="absolute -top-4 -left-4 text-2xl animate-sparkle" style={{animationDelay: '0.1s'}}>⭐</div>
+                                    <div className="absolute -top-8 right-2 text-xl animate-sparkle" style={{animationDelay: '0.3s'}}>🌟</div>
+                                    <div className="absolute top-10 -right-4 text-2xl animate-sparkle" style={{animationDelay: '0.5s'}}>✨</div>
+                                    
+                                    <div className="flex justify-center space-x-4 relative z-10">
+                                        <div className="text-7xl animate-float" style={{animationDelay: '0.2s'}}>🥤</div>
+                                        <div className="text-7xl animate-float" style={{animationDelay: '0s'}}>🍦</div>
                                     </div>
                                     
                                     <div className="bg-rose-50 p-8 rounded-[2rem] border-2 border-dashed border-rose-200 relative">
+                                        <div className="absolute top-2 left-2 text-yellow-400 opacity-60">⭐</div>
+                                        <div className="absolute bottom-2 right-2 text-yellow-400 opacity-60">🌟</div>
+
                                         <h2 className="text-3xl font-black text-rose-700 mb-4">おめでとう！！</h2>
                                         
-                                        <p className="text-xl text-gray-800 font-black mb-8">ぜひどうぞ！</p>
+                                        <p className="text-xl text-gray-800 font-black mb-8 leading-relaxed">
+                                            よかったらおいしいもの{"\n"}飲んでねー！
+                                        </p>
 
                                         <a 
                                             href={giftUrl} target="_blank" rel="noopener noreferrer"
@@ -121,7 +137,7 @@
                                         </a>
                                     </div>
 
-                                    <button onClick={() => setIsOpen(false)} className="text-gray-400 font-bold text-xs flex items-center justify-center mx-auto space-x-1">
+                                    <button onClick={() => setIsOpen(false)} className="text-gray-400 font-bold text-xs flex items-center justify-center mx-auto space-x-1 hover:text-rose-400 transition-colors">
                                         <SvgIcon type="rotate" />
                                         <span>戻る</span>
                                     </button>
@@ -131,28 +147,30 @@
 
                         {/* 下部デコレーション */}
                         <div className={`p-4 border-t flex justify-around transition-colors duration-1000 ${isOpen ? 'bg-rose-100/50 border-rose-100' : 'bg-amber-50 border-amber-100'}`}>
-                            {['🎈', '🎂', '🥤', '🍦', '🎁', '✨'].map((e, i) => (
-                                <span key={i} className={`text-lg transition-opacity duration-500 ${isOpen ? 'opacity-100' : 'opacity-20'}`}>
+                            {[isOpen ? '⭐' : '🎈', '🎂', '🥤', '🍦', '🎁', isOpen ? '🌟' : '✨'].map((e, i) => (
+                                <span key={i} className={`text-lg transition-all duration-500 ${isOpen ? 'opacity-100 scale-110' : 'opacity-20'}`}>
                                     {e}
                                 </span>
                             ))}
                         </div>
                     </div>
 
-                    <div className="mt-8 text-gray-400 text-[10px] font-black tracking-widest uppercase">
-                        Happy Birthday to You!
+                    <div className="mt-8 text-gray-400 text-[10px] font-black tracking-widest uppercase flex items-center space-x-2">
+                        <span>✨</span>
+                        <span>Happy Birthday to You!</span>
+                        <span>✨</span>
                     </div>
                 </div>
             );
         };
 
-            // Reactのレンダリング
-            try {
-                const root = ReactDOM.createRoot(document.getElementById('root'));
-                root.render(<App />);
-            } catch (e) {
-                document.getElementById('root').innerHTML = "<p style='padding:20px; text-align:center;'>表示エラーが発生しました。ブラウザを更新してください。</p>";
-            }
+        // Reactのレンダリング
+        try {
+            const root = ReactDOM.createRoot(document.getElementById('root'));
+            root.render(<App />);
+        } catch (e) {
+            document.getElementById('root').innerHTML = "<p style='padding:20px; text-align:center;'>表示エラーが発生しました。ブラウザを更新してください。</p>";
+        }
     </script>
 </body>
 </html>
