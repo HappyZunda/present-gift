@@ -23,7 +23,7 @@
         .animate-float { animation: float 3s infinite ease-in-out; }
         .animate-sparkle { animation: sparkle 1.5s infinite ease-in-out; }
         
-        body { background-color: #fefce8; margin: 0; }
+        body { margin: 0; }
     </style>
 </head>
 <body>
@@ -51,32 +51,96 @@
         const App = () => {
             const [isOpen, setIsOpen] = useState(false);
             const [giftUrl, setGiftUrl] = useState("https://www.google.com/"); 
+            const [giftUrl2, setGiftUrl2] = useState(""); 
+            const [theme, setTheme] = useState("1");
+            const [layoutStyle, setLayoutStyle] = useState("1"); // ボタンの数
+
+            // 配色パターンの定義
+            const themeConfig = {
+                "1": { // イエロー・ピンク系
+                    bgBefore: "bg-yellow-50",
+                    bgAfter: "bg-pink-50",
+                    borderBefore: "border-yellow-200",
+                    borderAfter: "border-pink-200",
+                    headerBefore: "bg-amber-400",
+                    headerAfter: "bg-rose-500",
+                    badgeTextBefore: "text-amber-800",
+                    badgeTextAfter: "text-rose-800",
+                    badgeBgBefore: "bg-white",
+                    badgeBgAfter: "bg-yellow-300",
+                    titleBefore: "text-amber-900",
+                    titleAfter: "text-rose-700",
+                    btnBefore: "bg-rose-500 hover:bg-rose-600",
+                    btnAfter: "from-rose-500 to-pink-500",
+                    cardFooterBefore: "bg-amber-50 border-amber-100",
+                    cardFooterAfter: "bg-rose-100/50 border-rose-100",
+                    subTitleAfter: "text-rose-400",
+                    iconCircle: "bg-amber-100"
+                },
+                "2": { // ブルー・パープル系
+                    bgBefore: "bg-blue-50",
+                    bgAfter: "bg-purple-50",
+                    borderBefore: "border-blue-200",
+                    borderAfter: "border-purple-200",
+                    headerBefore: "bg-indigo-400",
+                    headerAfter: "bg-violet-500",
+                    badgeTextBefore: "text-indigo-800",
+                    badgeTextAfter: "text-violet-800",
+                    badgeBgBefore: "bg-white",
+                    badgeBgAfter: "bg-cyan-300",
+                    titleBefore: "text-indigo-900",
+                    titleAfter: "text-violet-700",
+                    btnBefore: "bg-violet-500 hover:bg-violet-600",
+                    btnAfter: "from-violet-500 to-purple-500",
+                    cardFooterBefore: "bg-indigo-50 border-indigo-100",
+                    cardFooterAfter: "bg-purple-100/50 border-purple-100",
+                    subTitleAfter: "text-violet-400",
+                    iconCircle: "bg-indigo-100"
+                }
+            };
+
+            const currentTheme = themeConfig[theme] || themeConfig["1"];
 
             useEffect(() => {
                 try {
                     const params = new URLSearchParams(window.location.search);
+                    
+                    // ギフトURLの取得
                     const urlParam = params.get('url');
-                    if (urlParam) {
-                        setGiftUrl(decodeURIComponent(urlParam));
+                    if (urlParam) setGiftUrl(decodeURIComponent(urlParam));
+                    
+                    const urlParam2 = params.get('url2');
+                    if (urlParam2) setGiftUrl2(decodeURIComponent(urlParam2));
+                    
+                    // テーマの取得 (?theme=2 など)
+                    const themeParam = params.get('theme');
+                    if (themeParam && (themeParam === "1" || themeParam === "2")) {
+                        setTheme(themeParam);
+                    }
+
+                    // スタイルの取得 (?style=2 など)
+                    const styleParam = params.get('style');
+                    if (styleParam && (styleParam === "1" || styleParam === "2")) {
+                        setLayoutStyle(styleParam);
                     }
                 } catch (e) {
-                    console.error("URLの読み込みに失敗しました", e);
+                    console.error("URLの読み取りに失敗しました", e);
                 }
             }, []);
 
             return (
-                <div className={`min-h-screen w-full flex flex-col items-center justify-center p-4 transition-all duration-1000 ${isOpen ? 'bg-pink-50' : 'bg-yellow-50'}`}>
+                <div className={`min-h-screen w-full flex flex-col items-center justify-center p-4 transition-all duration-1000 ${isOpen ? currentTheme.bgAfter : currentTheme.bgBefore}`}>
                     
-                    <div className={`max-w-md w-full bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border-4 transition-all duration-1000 ${isOpen ? 'border-pink-200' : 'border-yellow-200'}`}>
+                    <div className={`max-w-md w-full bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border-4 transition-all duration-1000 ${isOpen ? currentTheme.borderAfter : currentTheme.borderBefore}`}>
                         
                         {/* ヘッダー */}
-                        <div className={`h-24 flex items-center justify-center relative overflow-hidden transition-colors duration-1000 ${isOpen ? 'bg-rose-500' : 'bg-amber-400'}`}>
+                        <div className={`h-24 flex items-center justify-center relative overflow-hidden transition-colors duration-1000 ${isOpen ? currentTheme.headerAfter : currentTheme.headerBefore}`}>
                             <div className="absolute inset-0 opacity-20 flex justify-around items-center p-4 text-white text-3xl">
                                 <span>{isOpen ? '✨' : '🎁'}</span>
                                 <span>{isOpen ? '⭐' : '✨'}</span>
                                 <span>{isOpen ? '🌟' : '🎈'}</span>
                             </div>
-                            <div className={`absolute top-4 right-[-35px] font-black py-1 px-12 transform rotate-45 shadow-md text-[10px] transition-colors ${isOpen ? 'bg-yellow-300 text-rose-800' : 'bg-white text-amber-800'}`}>
+                            <div className={`absolute top-4 right-[-35px] font-black py-1 px-12 transform rotate-45 shadow-md text-[10px] transition-colors ${isOpen ? currentTheme.badgeBgAfter + ' ' + currentTheme.badgeTextAfter : currentTheme.badgeBgBefore + ' ' + currentTheme.badgeTextBefore}`}>
                                 {isOpen ? 'CONGRATS!' : 'FOR YOU'}
                             </div>
                         </div>
@@ -85,14 +149,14 @@
                             {!isOpen ? (
                                 <div className="space-y-8 flex flex-col items-center">
                                     <div className="relative cursor-pointer group" onClick={() => setIsOpen(true)}>
-                                        <div className="w-32 h-32 bg-amber-100 rounded-full flex items-center justify-center shadow-xl animate-float relative z-10 group-hover:scale-110 transition-transform">
+                                        <div className={`w-32 h-32 ${currentTheme.iconCircle} rounded-full flex items-center justify-center shadow-xl animate-float relative z-10 group-hover:scale-110 transition-transform`}>
                                             <span className="text-6xl">🎂</span>
                                         </div>
-                                        <div className="absolute inset-0 bg-yellow-200 rounded-full blur-xl opacity-50 animate-pulse"></div>
+                                        <div className="absolute inset-0 bg-current opacity-20 rounded-full blur-xl animate-pulse"></div>
                                     </div>
 
                                     <div className="space-y-3">
-                                        <h1 className="text-3xl font-black text-amber-900 tracking-tighter">HAPPY BIRTHDAY!!</h1>
+                                        <h1 className={`text-3xl font-black ${currentTheme.titleBefore} tracking-tighter`}>HAPPY BIRTHDAY!!</h1>
                                         <p className="text-gray-600 font-bold whitespace-pre-wrap leading-relaxed text-lg">
                                             お誕生日おめでとう！！{"\n"}今年もすてきな年になりますように！！
                                         </p>
@@ -100,7 +164,7 @@
 
                                     <button 
                                         onClick={() => setIsOpen(true)}
-                                        className="w-full bg-rose-500 hover:bg-rose-600 text-white font-black py-5 rounded-2xl shadow-lg flex items-center justify-center space-x-3 text-lg transition-all active:scale-95"
+                                        className={`w-full ${currentTheme.btnBefore} text-white font-black py-5 rounded-2xl shadow-lg flex items-center justify-center space-x-3 text-lg transition-all active:scale-95`}
                                     >
                                         <SvgIcon type="gift" />
                                         <span>プレゼントを開ける</span>
@@ -118,29 +182,41 @@
                                         <div className="text-7xl animate-float" style={{animationDelay: '0s'}}>🍦</div>
                                     </div>
                                     
-                                    <div className="bg-rose-50 p-8 rounded-[2rem] border-2 border-dashed border-rose-200 relative">
+                                    <div className={`${isOpen && theme === "2" ? "bg-purple-50" : "bg-rose-50"} p-8 rounded-[2rem] border-2 border-dashed ${isOpen && theme === "2" ? "border-purple-200" : "border-rose-200"} relative`}>
                                         <div className="absolute top-2 left-2 text-yellow-400 opacity-60">⭐</div>
                                         <div className="absolute bottom-2 right-2 text-yellow-400 opacity-60">🌟</div>
 
-                                        <h2 className="text-3xl font-black text-rose-700 mb-4">おめでとう！！</h2>
+                                        <h2 className={`text-3xl font-black ${currentTheme.titleAfter} mb-4`}>Happy Birthday✨</h2>
                                         
                                         <div className="space-y-2 mb-8">
                                             <p className="text-xl text-gray-800 font-black leading-relaxed">
                                                 よかったらおいしいもの{"\n"}飲んでねー！
                                             </p>
-                                            <p className="text-sm text-rose-400 font-bold italic">By ゆーち</p>
+                                            <p className={`text-sm ${currentTheme.subTitleAfter} font-bold`}>By ゆーち</p>
                                         </div>
 
-                                        <a 
-                                            href={giftUrl} target="_blank" rel="noopener noreferrer"
-                                            className="block w-full bg-gradient-to-r from-rose-500 to-pink-500 text-white font-black py-5 rounded-xl shadow-xl flex items-center justify-center space-x-2 text-lg hover:brightness-110 transition-all"
-                                        >
-                                            <span>ギフトを受け取る</span>
-                                            <SvgIcon type="external" />
-                                        </a>
+                                        <div className="flex flex-col gap-3">
+                                            <a 
+                                                href={giftUrl} target="_blank" rel="noopener noreferrer"
+                                                className={`block w-full bg-gradient-to-r ${currentTheme.btnAfter} text-white font-black py-5 rounded-xl shadow-xl flex items-center justify-center space-x-2 text-lg hover:brightness-110 transition-all`}
+                                            >
+                                                <span>ギフトを受け取る{layoutStyle === "2" ? " ①" : ""}</span>
+                                                <SvgIcon type="external" />
+                                            </a>
+
+                                            {layoutStyle === "2" && giftUrl2 && (
+                                                <a 
+                                                    href={giftUrl2} target="_blank" rel="noopener noreferrer"
+                                                    className={`block w-full bg-gradient-to-r ${currentTheme.btnAfter} text-white font-black py-5 rounded-xl shadow-xl flex items-center justify-center space-x-2 text-lg hover:brightness-110 transition-all`}
+                                                >
+                                                    <span>ギフトを受け取る ②</span>
+                                                    <SvgIcon type="external" />
+                                                </a>
+                                            )}
+                                        </div>
                                     </div>
 
-                                    <button onClick={() => setIsOpen(false)} className="text-gray-400 font-bold text-xs flex items-center justify-center mx-auto space-x-1 hover:text-rose-400 transition-colors">
+                                    <button onClick={() => setIsOpen(false)} className="text-gray-400 font-bold text-xs flex items-center justify-center mx-auto space-x-1 hover:opacity-100 transition-opacity">
                                         <SvgIcon type="rotate" />
                                         <span>戻る</span>
                                     </button>
@@ -149,7 +225,7 @@
                         </div>
 
                         {/* 下部デコレーション */}
-                        <div className={`p-4 border-t flex justify-around transition-colors duration-1000 ${isOpen ? 'bg-rose-100/50 border-rose-100' : 'bg-amber-50 border-amber-100'}`}>
+                        <div className={`p-4 border-t flex justify-around transition-colors duration-1000 ${isOpen ? currentTheme.cardFooterAfter : currentTheme.cardFooterBefore}`}>
                             {[isOpen ? '⭐' : '🎈', '🎂', '🥤', '🍦', '🎁', isOpen ? '🌟' : '✨'].map((e, i) => (
                                 <span key={i} className={`text-lg transition-all duration-500 ${isOpen ? 'opacity-100 scale-110' : 'opacity-20'}`}>
                                     {e}
@@ -172,7 +248,7 @@
             const root = ReactDOM.createRoot(document.getElementById('root'));
             root.render(<App />);
         } catch (e) {
-            document.getElementById('root').innerHTML = "<p style='padding:20px; text-align:center;'>表示エラーが発生しました。ブラウザを更新してください。</p>";
+            document.getElementById('root').innerHTML = "<p style='padding:20px; text-align:center;'>表示エラーが発生しました。</p>";
         }
     </script>
 </body>
